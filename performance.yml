@@ -1,0 +1,72 @@
+config:
+  target: "https://api.todoist.com"
+  plugins:
+    expect: {}
+  phases:
+    - duration: 1
+      arrivalRate: 1
+      name: "Phase 1"
+  defaults:
+    headers:
+      Authorization: Bearer {{ $processEnvironment.TOKEN_TODOIST }}
+      Content-type: application/json
+  # processor: "./myProcessor.js"
+scenarios:
+  - flow:
+      # Creating a task
+      - post:
+          url: "/rest/v1/tasks"
+          json:
+            content: "An awesome task"
+            due_date: "2021-03-30"
+            due_lang: "en"
+            priority: 4
+          capture:
+            - json: "$.id"
+              as: "taskID"
+            - json: "$.content"
+              as: "taskContent"
+            - json: "$.due.date"
+              as: "taskDueDate"
+            - json: "$.priority"
+              as: "taskPriority"
+      - log: "Task ID: {{ taskID }}. Task name: {{ taskContent }}. Due date: {{ taskDueDate }}. Priority: {{ taskPriority }}"
+      # Getting an active task
+      - get:
+          url: "/rest/v1/tasks/{{ taskID }}"
+          capture:
+            - json: "$.content"
+              as: "retrievedContent"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - equals:
+              - {{ retrievedContent }}
+              - {{ taskContent }}
+      # Getting active tasks
+      - get:
+          url: "/rest/v1/tasks"
+          expect:
+            - statusCode: 200
+      # Updating a task using its ID
+      - post:
+          url: "/rest/v1/tasks/{{ taskID }}"
+          json:
+            content: "Updated task"
+          expect:
+            - statusCode: 204
+      # Changing status of task to 'complete' (close the task)
+      - post:
+          url: "/rest/v1/tasks/{{ taskID }}/close"
+          expect:
+            - statusCode: 204
+      # Reopening a task that was previously completed (closed)
+      - post:
+          url: "/rest/v1/tasks/{{ taskID }}/reopen"
+          expect:
+            - statusCode: 204
+      # Deleting an existing task by its ID
+      - delete:
+          url: "/rest/v1/tasks/{{ taskID }}"
+          expect:
+            - statusCode: 204
