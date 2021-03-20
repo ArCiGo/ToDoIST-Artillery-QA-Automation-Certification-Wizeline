@@ -10,15 +10,16 @@ config:
     headers:
       Authorization: Bearer {{ $processEnvironment.TOKEN_TODOIST }}
       Content-type: application/json
-  # processor: "./myProcessor.js"
+  processor: "./my-functions.js"
 scenarios:
   - flow:
+      - function: "generateRandomData"
       # Creating a task
       - post:
           url: "/rest/v1/tasks"
           json:
-            content: "An awesome task"
-            due_date: "2021-03-30"
+            content: "{{ generatedContent }}"
+            due_date: "{{ formattedDate }}"
             due_lang: "en"
             priority: 4
           capture:
@@ -30,6 +31,9 @@ scenarios:
               as: "taskDueDate"
             - json: "$.priority"
               as: "taskPriority"
+          expect:
+            - statusCode: 200
+            - contentType: json
       - log: "Task ID: {{ taskID }}. Task name: {{ taskContent }}. Due date: {{ taskDueDate }}. Priority: {{ taskPriority }}"
       # Getting an active task
       - get:
@@ -43,6 +47,7 @@ scenarios:
             - equals:
               - {{ retrievedContent }}
               - {{ taskContent }}
+      - log: "Retrieved content: {{ retrievedContent }}. Task content: {{ taskContent }}"
       # Getting active tasks
       - get:
           url: "/rest/v1/tasks"

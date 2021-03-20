@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "artillery": "^1.6.2",
-    "artillery-plugin-expect": "^1.3.0"
+    "artillery-plugin-expect": "^1.3.0",
+    "faker": "^5.4.0"
   }
 }
