@@ -22,8 +22,6 @@ Basic ToDoIST API Performance Automation Framework
 - [x] Reopen a task
 - [x] Delete a task
 
-**Note:** Not all requests returns content or JSON schema
-
 ### Bonus:
 
 - [x] Integrate FakerJS to generate random data
