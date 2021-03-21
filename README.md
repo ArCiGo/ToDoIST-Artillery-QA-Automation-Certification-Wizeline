@@ -26,7 +26,7 @@ Basic ToDoIST API Performance Automation Framework
 
 ### Bonus:
 
-- [ ] Integrate FakerJS to generate random data
+- [x] Integrate FakerJS to generate random data
 
 ### How to run the project
 
